@@ -1,0 +1,16 @@
+{
+  "name": "footforge-football-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npx --yes vercel dev"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
+    "openai": "^5.12.2"
+  }
+}

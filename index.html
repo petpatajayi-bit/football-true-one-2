@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚽ Football Training Tracker</title>
+    <meta
+      name="description"
+      content="Track football sessions, training progress, stamina, and match readiness in one simple dashboard."
+    />
+    <style>
+      :root {
+        --bg: #f3f8f2;
+        --panel: #ffffff;
+        --panel-soft: #eef7ee;
+        --card: #f7fbf7;
+        --text: #13271b;
+        --muted: #587062;
+        --primary: #1d9a57;
+        --primary-dark: #0f6c3d;
+        --accent: #c8f1d3;
+        --warning: #f6c862;
+        --danger: #e5645d;
+        --line: rgba(19, 39, 27, 0.08);
+        --shadow: 0 18px 40px rgba(17, 52, 34, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 999px;
+        font-weight: 700;
+        padding: 0.72rem 1.1rem;
+        transition: transform 0.2s ease;
+      }
+
+      .pill:hover { transform: translateY(-1px); }
+
+      .pill.primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 16px 28px rgba(29, 154, 87, 0.22);
+      }
+
+      .pill.secondary {
+        background: rgba(255,255,255,0.7);
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+
+      .hero {
+        padding: 42px 0 26px;
+      }
+
+      .hero-wrap {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(29, 154, 87, 0.12);
+        color: var(--primary-dark);
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 18px 0 16px;
+        font-size: clamp(2.8rem, 5vw, 5rem);
+        line-height: 0.96;
+        letter-spacing: -0.06em;
+      }
+
+      .hero-copy p {
+        margin: 0 0 26px;
+        color: var(--muted);
+        font-size: 1.06rem;
+        max-width: 560px;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+
+      .mini-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+
+      .mini-stat {
+        min-width: 130px;
+      }
+
+      .mini-stat strong {
+        display: block;
+        font-size: 1.6rem;
+        letter-spacing: -0.05em;
+      }
+
+      .mini-stat span {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .hero-card {
+        background: linear-gradient(135deg, #14291d, #1d3a2a);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 30px;
+        color: white;
+        padding: 26px;
+        box-shadow: var(--shadow);
+      }
+
+      .score-badge {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 14px 16px;
+        margin-bottom: 22px;
+      }
+
+      .score-badge strong {
+        display: block;
+        font-size: 1.7rem;
+        letter-spacing: -0.05em;
+      }
+
+      .score-badge small {
+        color: rgba(255,255,255,0.7);
+      }
+
+      .ring-wrap {
+        display: grid;
+        place-items: center;
+        margin: 14px 0 26px;
+      }
+
+      .ring {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: conic-gradient(var(--primary) 0 76%, rgba(255,255,255,0.12) 76% 100%);
+      }
+
+      .ring::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        background: #163125;
+        border-radius: 50%;
+      }
+
+      .ring-value {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+      }
+
+      .ring-value strong {
+        display: block;
+        font-size: 2.1rem;
+        letter-spacing: -0.06em;
+      }
+
+      .ring-value span {
+        color: rgba(255,255,255,0.75);
+        font-size: 0.8rem;
+      }
+
+      .hero-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .hero-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 14px;
+        padding: 10px 12px;
+      }
+
+      .hero-item span {
+        color: rgba(255,255,255,0.8);
+      }
+
+      .section {
+        padding: 22px 0 58px;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+      }
+
+      .panel {
+        background: rgba(255,255,255,0.72);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 24px;
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin: 0 0 18px;
+        letter-spacing: -0.05em;
+      }
+
+      .session-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .session-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px 16px;
+      }
+
+      .session-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .session-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(29, 154, 87, 0.12);
+        color: var(--primary-dark);
+        display: grid;
+        place-items: center;
+        font-size: 1.3rem;
+      }
+
+      .session-name strong,
+      .session-name span {
+        display: block;
+      }
+
+      .session-name span {
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .session-state {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 0.45rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .session-state.done {
+        background: rgba(29,154,87,0.12);
+        color: var(--primary-dark);
+      }
+
+      .session-state.pending {
+        background: rgba(246, 200, 98, 0.18);
+        color: #8c6b17;
+      }
+
+      .progress-stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .progress-row {
+        display: grid;
+        gap: 8px;
+      }
+
+      .progress-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .bar {
+        height: 10px;
+        background: rgba(19,39,27,0.06);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--primary), #7cd399);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3rem);
+        letter-spacing: -0.05em;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .week-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .day-card {
+        background: rgba(255,255,255,0.74);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 18px;
+      }
+
+      .day-card h3 {
+        margin: 0 0 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .day-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        padding: 0.32rem 0.6rem;
+        border-radius: 999px;
+        background: rgba(29,154,87,0.12);
+        color: var(--primary-dark);
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      .day-card ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .day-card li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .check-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary);
+      }
+
+      .check-dot.pending {
+        background: rgba(19,39,27,0.18);
+      }
+
+      .lower-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 24px;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field label {
+        color: var(--text);
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border: 1px solid rgba(19,39,27,0.12);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        background: rgba(255,255,255,0.9);
+        color: var(--text);
+        outline: none;
+      }
+
+      .field textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .coach-notes {
+        display: grid;
+        gap: 12px;
+      }
+
+      .note-card {
+        background: rgba(255,255,255,0.7);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .note-card strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .note-card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .metric-card {
+        background: rgba(255,255,255,0.72);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+      }
+
+      .metric-card .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .metric-card strong {
+        font-size: 2rem;
+        letter-spacing: -0.06em;
+      }
+
+      .metric-card small {
+        color: var(--muted);
+      }
+
+      .empty-state,
+      .data-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .data-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .data-tools h3 {
+        margin: 0 0 6px;
+      }
+
+      .data-tool-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .watch-panel {
+        background: linear-gradient(135deg, rgba(18, 38, 27, 0.98), rgba(19, 61, 42, 0.96));
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 24px 42px rgba(15, 55, 35, 0.28);
+      }
+
+      .watch-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .watch-device-name {
+        display: block;
+        margin: -8px 0 18px;
+        color: rgba(255,255,255,0.78);
+        font-size: 0.9rem;
+      }
+
+      .watch-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.42rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(246, 200, 98, 0.12);
+        border: 1px solid rgba(246, 200, 98, 0.24);
+        color: #ffe9ae;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .watch-status.connected {
+        background: rgba(122, 220, 154, 0.14);
+        border-color: rgba(122, 220, 154, 0.25);
+        color: #c8ffd8;
+      }
+
+      .watch-status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #f6c862;
+      }
+
+      .watch-status.connected::before {
+        background: #79f39d;
+        box-shadow: 0 0 12px rgba(121, 243, 157, 0.8);
+      }
+
+      .watch-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .watch-card {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 22px;
+        padding: 18px;
+      }
+
+      .watch-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        color: rgba(255,255,255,0.75);
+        font-size: 0.88rem;
+      }
+
+      .watch-card strong {
+        display: block;
+        font-size: clamp(2rem, 3vw, 3.1rem);
+        line-height: 1;
+        letter-spacing: -0.06em;
+      }
+
+      .watch-card small {
+        display: block;
+        margin-top: 8px;
+        color: rgba(255,255,255,0.7);
+      }
+
+      .watch-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255,255,255,0.09);
+        color: rgba(255,255,255,0.75);
+      }
+
+      .watch-help {
+        margin: 16px 0 0;
+        color: rgba(255,255,255,0.72);
+        font-size: 0.85rem;
+      }
+
+      .assistant-wrap {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .assistant-panel,
+      .chat-panel,
+      .routine-panel {
+        background: rgba(255,255,255,0.75);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 24px;
+        min-width: 0;
+      }
+
+      .assistant-panel h3,
+      .chat-panel h3,
+      .routine-panel h3 {
+        margin: 0 0 16px;
+        font-size: 1.8rem;
+        letter-spacing: -0.05em;
+      }
+
+      .focus-box {
+        background: linear-gradient(135deg, rgba(29,154,87,0.12), rgba(29,154,87,0.04));
+        border: 1px solid rgba(29,154,87,0.12);
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .focus-box strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .focus-box p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .suggestion-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .suggestion {
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.7);
+        border-radius: 12px;
+        padding: 10px 12px;
+        text-align: left;
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.62;
+      }
+
+      .chat-window {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 16px;
+        min-height: 220px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+
+      .message {
+        max-width: 85%;
+        padding: 12px 14px;
+        border-radius: 16px;
+        line-height: 1.5;
+      }
+
+      .message.ai {
+        background: rgba(29,154,87,0.1);
+        color: var(--text);
+        border: 1px solid rgba(29,154,87,0.12);
+      }
+
+      .message.ai a {
+        display: inline-block;
+        margin-top: 6px;
+        color: var(--primary-dark);
+        font-weight: 700;
+        text-decoration: underline;
+      }
+
+      .message.user {
+        margin-left: auto;
+        background: rgba(19,39,27,0.9);
+        color: white;
+      }
+
+      .message-image {
+        display: block;
+        width: min(100%, 240px);
+        max-height: 220px;
+        margin-top: 10px;
+        border-radius: 12px;
+        object-fit: cover;
+      }
+
+      .chat-form {
+        display: grid;
+        gap: 10px;
+      }
+
+      .chat-form-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .chat-form-row input {
+        min-width: 0;
+        flex: 1;
+        border: 1px solid rgba(19,39,27,0.12);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        background: rgba(255,255,255,0.92);
+      }
+
+      .chat-attachment-controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chat-attachment-controls .pill {
+        padding: 0.55rem 0.85rem;
+        font-size: 0.88rem;
+      }
+
+      .photo-preview {
+        display: block;
+        width: min(100%, 220px);
+        max-height: 180px;
+        border-radius: 14px;
+        object-fit: cover;
+      }
+
+      .photo-help {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .routine-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .routine-form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .routine-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .routine-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.72);
+      }
+
+      .routine-item strong {
+        display: block;
+      }
+
+      .routine-item small {
+        color: var(--muted);
+      }
+
+      .routine-check {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(19,39,27,0.15);
+        background: transparent;
+        position: relative;
+      }
+
+      .routine-check.done {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .routine-check.done::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .routine-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .remove-button {
+        border: 1px solid rgba(19,39,27,0.1);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.8);
+        color: var(--muted);
+        padding: 0.45rem 0.65rem;
+        font-size: 0.8rem;
+      }
+
+      .remove-button:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .remove-button {
+        border: 1px solid rgba(19,39,27,0.1);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.8);
+        color: var(--muted);
+        padding: 0.45rem 0.65rem;
+        font-size: 0.8rem;
+      }
+
+      .remove-button:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      footer {
+        padding: 12px 0 36px;
+        color: var(--muted);
+      }
+
+      .footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+
+      @media (max-width: 980px) {
+        .hero-wrap,
+        .dashboard,
+        .lower-grid,
+        .week-grid,
+        .metric-grid,
+        .watch-grid,
+        .assistant-wrap,
+        .routine-layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .nav-links {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar-inner,
+        .nav,
+        .footer-row,
+        .section-head {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .nav {
+          padding: 12px 0;
+        }
+
+        .cta-row,
+        .nav-actions {
+          width: 100%;
+        }
+
+        .pill {
+          flex: 1;
+        }
+
+        .session-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .data-tools {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <div class="promo-text">Football Training Tracker</div>
+        <div class="topbar-meta">
+          <span>Week 12</span>
+          <span>•</span>
+          <span>Recovery: 82%</span>
+          <span>•</span>
+          <span>Next match: Saturday</span>
+        </div>
+      </div>
+    </div>
+
+    <header>
+      <div class="container nav">
+        <a class="brand" href="#top" aria-label="Football Training Tracker home">
+          <span class="brand-mark">⚽</span>
+          <span>FootForge</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#overview">Overview</a>
+          <a href="#plan">Training plan</a>
+          <a href="#stats">Performance</a>
+          <a href="#log">Session log</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="pill secondary" href="#log">Add session</a>
+          <a class="pill primary" href="#plan">View plan</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top" class="container">
+      <section class="hero" id="overview">
+        <div class="hero-wrap">
+          <div class="hero-copy">
+            <span class="eyebrow">Athlete dashboard</span>
+            <h1>Train sharp. Play smarter.</h1>
+            <p>
+              Track your football sessions, sprint work, technical drills, and recovery in one place so every training day moves you closer to match fitness.
+            </p>
+
+            <div class="cta-row">
+              <a class="pill primary" href="#log">Log training</a>
+              <a class="pill secondary" href="#stats">See progress</a>
+            </div>
+
+            <div class="mini-grid" aria-label="Training stats">
+              <div class="mini-stat">
+                <strong id="month-session-count">0</strong>
+                <span>sessions this month</span>
+              </div>
+              <div class="mini-stat">
+                <strong id="month-training-time">0 min</strong>
+                <span>training logged this month</span>
+              </div>
+              <div class="mini-stat">
+                <strong id="routine-progress">0%</strong>
+                <span>routine tasks complete</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-card" aria-label="Player readiness panel">
+            <div class="score-badge">
+              <div>
+                <strong id="player-display-name">Your player profile</strong>
+                <small id="player-position-display">Add your name and position below</small>
+              </div>
+              <a class="pill secondary" href="#player-profile">Edit profile</a>
+            </div>
+
+            <div class="ring-wrap">
+              <div class="ring">
+                <div class="ring-value">
+                  <strong>⚽</strong>
+                  <span>Your season</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-list">
+              <div class="hero-item">
+                <span>Sessions logged</span>
+                <strong id="total-session-count">0</strong>
+              </div>
+              <div class="hero-item">
+                <span>Training minutes</span>
+                <strong id="total-training-time">0</strong>
+              </div>
+              <div class="hero-item">
+                <span>Latest possession</span>
+                <strong id="latest-possession">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section dashboard">
+        <div class="panel">
+          <h2>Today's training focus</h2>
+          <div class="session-list" id="session-list">
+            <p class="empty-state">No sessions logged yet. Add your first training session below.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Performance snapshot</h3>
+          <div class="progress-stack">
+            <div class="progress-row">
+              <div class="progress-top">
+                <span>Sessions logged</span>
+                <strong id="snapshot-sessions">0</strong>
+              </div>
+              <div class="bar"><span id="snapshot-sessions-bar" style="width:0%"></span></div>
+            </div>
+
+            <div class="progress-row">
+              <div class="progress-top">
+                <span>Training minutes</span>
+                <strong id="snapshot-minutes">0</strong>
+              </div>
+              <div class="bar"><span id="snapshot-minutes-bar" style="width:0%"></span></div>
+            </div>
+
+            <div class="progress-row">
+              <div class="progress-top">
+                <span>Routine tasks complete</span>
+                <strong id="snapshot-routine">0%</strong>
+              </div>
+              <div class="bar"><span id="snapshot-routine-bar" style="width:0%"></span></div>
+            </div>
+
+            <div class="progress-row">
+              <div class="progress-top">
+                <span>Latest match possession</span>
+                <strong id="snapshot-possession">--</strong>
+              </div>
+              <div class="bar"><span id="snapshot-possession-bar" style="width:0%"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section lower-grid" id="player-profile">
+        <div class="panel">
+          <h3>Player profile</h3>
+          <form id="profile-form" class="form-grid">
+            <div class="field">
+              <label for="player-name">Your name</label>
+              <input id="player-name" type="text" maxlength="50" placeholder="Example: Alex" autocomplete="name" />
+            </div>
+            <div class="field">
+              <label for="player-position">Position</label>
+              <select id="player-position">
+                <option value="">Choose your position</option>
+                <option>Goalkeeper</option>
+                <option>Defender</option>
+                <option>Midfielder</option>
+                <option>Forward</option>
+              </select>
+            </div>
+            <button class="pill primary" type="submit">Save profile</button>
+            <p class="data-note" id="profile-message" role="status" aria-live="polite">Your profile is saved privately in this browser.</p>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h3>Log match stats</h3>
+          <form id="match-form" class="form-grid">
+            <div class="field">
+              <label for="match-steps">Steps (optional)</label>
+              <input id="match-steps" type="number" min="0" max="100000" placeholder="Enter from your watch" />
+            </div>
+            <div class="field">
+              <label for="match-possession">Team possession % (optional)</label>
+              <input id="match-possession" type="number" min="0" max="100" placeholder="Enter from match stats" />
+            </div>
+            <button class="pill primary" type="submit">Save match stats</button>
+            <p class="data-note" id="match-message" role="status" aria-live="polite">Enter real match or watch numbers; nothing is guessed.</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" id="plan">
+        <div class="section-head">
+          <h2>Example weekly training plan</h2>
+          <p>Use these as ideas, then adjust them with your coach to fit your schedule and ability.</p>
+        </div>
+
+        <div class="week-grid">
+          <article class="day-card">
+            <h3>Monday <span class="day-tag">High</span></h3>
+            <ul>
+              <li><span>Passing circuit</span><span class="check-dot"></span></li>
+              <li><span>Agility ladder</span><span class="check-dot"></span></li>
+              <li><span>Cool-down</span><span class="check-dot pending"></span></li>
+            </ul>
+          </article>
+
+          <article class="day-card">
+            <h3>Wednesday <span class="day-tag">Medium</span></h3>
+            <ul>
+              <li><span>Dribbling moves</span><span class="check-dot"></span></li>
+              <li><span>1v1 routines</span><span class="check-dot pending"></span></li>
+              <li><span>Mobility</span><span class="check-dot pending"></span></li>
+            </ul>
+          </article>
+
+          <article class="day-card">
+            <h3>Friday <span class="day-tag">Match</span></h3>
+            <ul>
+              <li><span>Team shape</span><span class="check-dot"></span></li>
+              <li><span>Set pieces</span><span class="check-dot"></span></li>
+              <li><span>Recovery</span><span class="check-dot pending"></span></li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section lower-grid" id="log">
+        <div class="panel">
+          <h3>Add training session</h3>
+          <form id="session-form" class="form-grid">
+            <div class="field">
+              <label for="session-name">Session name</label>
+              <input id="session-name" type="text" placeholder="Example: Speed gates" required />
+            </div>
+
+            <div class="field">
+              <label for="session-type">Focus</label>
+              <select id="session-type">
+                <option>Technical</option>
+                <option>Fitness</option>
+                <option>Passing</option>
+                <option>Recovery</option>
+                <option>Match prep</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="session-duration">Duration (minutes)</label>
+              <input id="session-duration" type="number" min="10" max="120" value="40" required />
+            </div>
+
+            <div class="field">
+              <label for="session-notes">Coach notes</label>
+              <textarea id="session-notes" placeholder="What went well? What needs work?"></textarea>
+            </div>
+
+            <button class="pill primary" type="submit">Save session</button>
+            <p class="data-note" id="session-message" role="status" aria-live="polite">Sessions are saved in this browser.</p>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h3>Starter tips</h3>
+          <div class="coach-notes">
+            <div class="note-card">
+              <strong>First touch</strong>
+              <p>Try receiving the ball with your body open so your next pass or movement is easier.</p>
+            </div>
+
+            <div class="note-card">
+              <strong>Recovery</strong>
+              <p>Plan easy recovery after hard sessions. Ask a qualified coach or clinician about pain or injury.</p>
+            </div>
+
+            <div class="note-card">
+              <strong>Make it your own</strong>
+              <p>Use your session notes to record what you practised and what you want to work on next.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="stats">
+        <div class="section-head">
+          <h2>Performance metrics</h2>
+          <p>Review the numbers that matter most for match preparation.</p>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="title">
+              <span>Sessions logged</span>
+              <span>⚽</span>
+            </div>
+            <strong id="metric-session-count">0</strong>
+            <small>total</small>
+          </div>
+
+          <div class="metric-card">
+            <div class="title">
+              <span>Training time</span>
+              <span>⏱️</span>
+            </div>
+            <strong id="metric-training-time">0</strong>
+            <small>minutes logged</small>
+          </div>
+
+          <div class="metric-card">
+            <div class="title">
+              <span>Last match steps</span>
+              <span>👟</span>
+            </div>
+            <strong id="metric-steps">--</strong>
+            <small>manually recorded</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="panel watch-panel">
+          <div class="watch-header">
+            <h2 style="margin:0; letter-spacing:-0.05em;">Watch sync</h2>
+            <span class="watch-status" id="watch-status">Not connected</span>
+          </div>
+          <p class="watch-device-name" id="watch-device-name" aria-live="polite">No Bluetooth device selected</p>
+
+          <div class="watch-grid">
+            <div class="watch-card">
+              <div class="watch-label">
+                <span>Heart rate</span>
+                <span>💓</span>
+              </div>
+              <strong id="heart-rate">--</strong>
+              <small>bpm</small>
+            </div>
+
+            <div class="watch-card">
+              <div class="watch-label">
+                <span>Steps</span>
+                <span>👟</span>
+              </div>
+              <strong id="step-count">--</strong>
+              <small id="step-count-note">Needs watch-specific support</small>
+            </div>
+
+            <div class="watch-card">
+              <div class="watch-label">
+                <span>Field possession</span>
+                <span>⚽</span>
+              </div>
+              <strong id="possession-value">--</strong>
+              <small>Record from match stats</small>
+            </div>
+          </div>
+
+          <div class="watch-footer">
+            <span id="watch-message" role="status" aria-live="polite">Pair a compatible heart-rate device to start receiving data.</span>
+            <button class="pill secondary" type="button" id="sync-watch">Connect watch</button>
+          </div>
+          <p class="watch-help">Turn on Bluetooth and make your watch discoverable, then press Connect watch to open the browser’s nearby-device picker. The picker can show any nearby devices the browser detects; websites cannot scan silently or reveal names a device does not broadcast. Choose a watch or heart-rate sensor that supports the standard Bluetooth heart-rate service to receive heart rate. Other selected devices may connect unsuccessfully. Steps and possession are not provided by that service.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="assistant-wrap">
+          <div class="assistant-panel">
+            <h3>Free football coach</h3>
+            <div class="focus-box">
+              <strong>Built-in coach · no API key</strong>
+              <p>Get free football tips and answers about stats saved in this browser. For other questions, look up a short online summary. Photo analysis needs a separately hosted AI service.</p>
+            </div>
+
+            <div class="suggestion-list">
+              <button class="suggestion" type="button">What should I focus on today?</button>
+              <button class="suggestion" type="button">How do I improve my passing?</button>
+              <button class="suggestion" type="button">Am I ready for the next match?</button>
+              <button class="suggestion" type="button">What should I do after training?</button>
+            </div>
+          </div>
+
+          <div class="chat-panel">
+            <h3>Ask the free coach</h3>
+            <div class="chat-window" id="chat-window" aria-live="polite">
+              <div class="message ai">Ask for a training tip or saved stats. For other questions, I can search online for a short summary.</div>
+            </div>
+
+            <form id="chat-form" class="chat-form">
+              <div class="chat-attachment-controls">
+                <input id="photo-input" type="file" accept="image/*" hidden />
+                <button class="pill secondary" id="attach-photo" type="button">📷 Add a photo</button>
+                <button class="remove-button" id="remove-photo" type="button" hidden>Remove photo</button>
+                <span class="photo-help" id="photo-help">On a phone, choose Camera or Photo Library.</span>
+                <span class="photo-help">The free coach keeps photos on this device and cannot analyze them. Photo analysis needs an online AI service.</span>
+              </div>
+              <img class="photo-preview" id="photo-preview" alt="Selected football photo preview" hidden />
+              <div class="chat-form-row">
+                <input id="chat-input" type="text" maxlength="2000" placeholder="Ask a football training question..." aria-label="Ask the AI football coach a question" />
+                <button class="pill primary" type="submit">Send</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="routine-panel">
+          <h3>My routine</h3>
+          <div class="routine-layout">
+            <form id="routine-form" class="routine-form">
+              <div class="field">
+                <label for="routine-name">Routine task</label>
+                <input id="routine-name" type="text" placeholder="Example: Recovery stretch" required />
+              </div>
+
+              <div class="field">
+                <label for="routine-time">Time</label>
+                <input id="routine-time" type="text" placeholder="Example: 7:30 AM" />
+              </div>
+
+              <button class="pill primary" type="submit">Add to routine</button>
+              <p class="data-note" id="routine-message" role="status" aria-live="polite">Routine tasks stay saved on this device.</p>
+            </form>
+
+            <div class="routine-list" id="routine-list">
+              <p class="empty-state">No routine tasks yet. Add the steps you want to follow.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section panel data-tools">
+        <div>
+          <h3>Back up your tracker</h3>
+          <p class="data-note">Your profile and logs stay in this browser on this device. Download a backup to keep or move your data.</p>
+          <p class="data-note" id="backup-message" role="status" aria-live="polite"></p>
+        </div>
+        <div class="data-tool-actions">
+          <button class="pill secondary" type="button" id="export-data">Download backup</button>
+          <button class="pill secondary" type="button" id="choose-import">Restore backup</button>
+          <input id="import-data" type="file" accept="application/json,.json" hidden />
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-row">
+        <div class="brand" aria-label="FootForge footer">
+          <span class="brand-mark">⚽</span>
+          <span>FootForge</span>
+        </div>
+        <span>© 2026 Football Training Tracker • Your data stays on your device</span>
+      </div>
+    </footer>
+
+    <script>
+      const sessionForm = document.getElementById('session-form');
+      const sessionList = document.getElementById('session-list');
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatWindow = document.getElementById('chat-window');
+      const photoInput = document.getElementById('photo-input');
+      const attachPhotoButton = document.getElementById('attach-photo');
+      const removePhotoButton = document.getElementById('remove-photo');
+      const photoPreview = document.getElementById('photo-preview');
+      const photoHelp = document.getElementById('photo-help');
+      const suggestionButtons = document.querySelectorAll('.suggestion');
+      const routineForm = document.getElementById('routine-form');
+      const routineList = document.getElementById('routine-list');
+      const profileForm = document.getElementById('profile-form');
+      const matchForm = document.getElementById('match-form');
+      const exportButton = document.getElementById('export-data');
+      const importButton = document.getElementById('choose-import');
+      const importInput = document.getElementById('import-data');
+      const heartRateEl = document.getElementById('heart-rate');
+      const syncButton = document.getElementById('sync-watch');
+      const watchStatus = document.getElementById('watch-status');
+      const watchDeviceName = document.getElementById('watch-device-name');
+      const watchMessage = document.getElementById('watch-message');
+      const storageKey = 'footforge-player-data-v1';
+      const appData = loadAppData();
+      let connectedWatch = null;
+      let heartRateCharacteristic = null;
+      let selectedImageData = '';
+      let selectedImagePreviewUrl = '';
+      let isChatSending = false;
+      let isPhotoReading = false;
+      let photoReadToken = 0;
+      const conversationHistory = [];
+
+      function loadAppData() {
+        try {
+          const saved = JSON.parse(localStorage.getItem('footforge-player-data-v1') || '{}');
+          return {
+            profile: saved.profile && typeof saved.profile === 'object' ? saved.profile : { name: '', position: '' },
+            sessions: Array.isArray(saved.sessions) ? saved.sessions : [],
+            routine: Array.isArray(saved.routine) ? saved.routine : [],
+            matches: Array.isArray(saved.matches) ? saved.matches : []
+          };
+        } catch (error) {
+          return { profile: { name: '', position: '' }, sessions: [], routine: [], matches: [] };
+        }
+      }
+
+      function saveAppData() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(appData));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function makeElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+
+      function renderSessions() {
+        sessionList.replaceChildren();
+        if (!appData.sessions.length) {
+          sessionList.appendChild(makeElement('p', 'empty-state', 'No sessions logged yet. Add your first training session below.'));
+          return;
+        }
+
+        const emojiMap = { Technical: '⚽', Fitness: '🏃', Passing: '🎯', Recovery: '🧘', 'Match prep': '🥅' };
+        [...appData.sessions].reverse().forEach((session) => {
+          const item = makeElement('div', 'session-item');
+          const meta = makeElement('div', 'session-meta');
+          meta.appendChild(makeElement('div', 'session-badge', emojiMap[session.type] || '⚽'));
+          const name = makeElement('div', 'session-name');
+          name.appendChild(makeElement('strong', '', session.name));
+          const date = new Date(session.createdAt).toLocaleDateString();
+          name.appendChild(makeElement('span', '', `${session.duration} min • ${session.type} • ${date}`));
+          if (session.notes) name.appendChild(makeElement('span', '', session.notes));
+          meta.appendChild(name);
+          const remove = makeElement('button', 'remove-button', 'Delete');
+          remove.type = 'button';
+          remove.dataset.id = session.id;
+          remove.setAttribute('aria-label', `Delete ${session.name} session`);
+          item.append(meta, remove);
+          sessionList.appendChild(item);
+        });
+      }
+
+      function renderRoutine() {
+        routineList.replaceChildren();
+        if (!appData.routine.length) {
+          routineList.appendChild(makeElement('p', 'empty-state', 'No routine tasks yet. Add the steps you want to follow.'));
+          return;
+        }
+
+        appData.routine.forEach((task) => {
+          const item = makeElement('div', 'routine-item');
+          const details = makeElement('div');
+          details.appendChild(makeElement('strong', '', task.name));
+          details.appendChild(makeElement('small', '', task.time || 'Flexible'));
+          const actions = makeElement('div', 'routine-actions');
+          const check = makeElement('button', `routine-check${task.done ? ' done' : ''}`);
+          check.type = 'button';
+          check.dataset.id = task.id;
+          check.setAttribute('aria-label', `Mark ${task.name} ${task.done ? 'not ' : ''}complete`);
+          check.setAttribute('aria-pressed', String(Boolean(task.done)));
+          const remove = makeElement('button', 'remove-button', 'Remove');
+          remove.type = 'button';
+          remove.dataset.id = task.id;
+          remove.setAttribute('aria-label', `Remove ${task.name} from routine`);
+          actions.append(check, remove);
+          item.append(details, actions);
+          routineList.appendChild(item);
+        });
+      }
+
+      function renderDashboard() {
+        const now = new Date();
+        const thisMonth = appData.sessions.filter((session) => {
+          const date = new Date(session.createdAt);
+          return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+        });
+        const monthMinutes = thisMonth.reduce((total, session) => total + Number(session.duration || 0), 0);
+        const totalMinutes = appData.sessions.reduce((total, session) => total + Number(session.duration || 0), 0);
+        const completedTasks = appData.routine.filter((task) => task.done).length;
+        const routinePercent = appData.routine.length ? Math.round(completedTasks / appData.routine.length * 100) : 0;
+        const latestMatch = appData.matches[appData.matches.length - 1];
+
+        document.getElementById('month-session-count').textContent = thisMonth.length;
+        document.getElementById('month-training-time').textContent = `${monthMinutes} min`;
+        document.getElementById('routine-progress').textContent = `${routinePercent}%`;
+        document.getElementById('total-session-count').textContent = appData.sessions.length;
+        document.getElementById('total-training-time').textContent = totalMinutes;
+        document.getElementById('snapshot-sessions').textContent = appData.sessions.length;
+        document.getElementById('snapshot-minutes').textContent = totalMinutes;
+        document.getElementById('snapshot-routine').textContent = `${routinePercent}%`;
+        document.getElementById('snapshot-possession').textContent = latestMatch?.possession === null || latestMatch?.possession === undefined ? '--' : `${latestMatch.possession}%`;
+        document.getElementById('latest-possession').textContent = latestMatch?.possession === null || latestMatch?.possession === undefined ? '--' : `${latestMatch.possession}%`;
+        document.getElementById('metric-session-count').textContent = appData.sessions.length;
+        document.getElementById('metric-training-time').textContent = totalMinutes;
+        document.getElementById('metric-steps').textContent = latestMatch?.steps === null || latestMatch?.steps === undefined ? '--' : Number(latestMatch.steps).toLocaleString();
+        document.getElementById('step-count').textContent = latestMatch?.steps === null || latestMatch?.steps === undefined ? '--' : Number(latestMatch.steps).toLocaleString();
+        document.getElementById('step-count-note').textContent = latestMatch?.steps === null || latestMatch?.steps === undefined ? 'Needs watch-specific support' : 'last recorded match';
+        document.getElementById('possession-value').textContent = latestMatch?.possession === null || latestMatch?.possession === undefined ? '--' : `${latestMatch.possession}%`;
+        document.getElementById('snapshot-sessions-bar').style.width = `${Math.min(appData.sessions.length * 10, 100)}%`;
+        document.getElementById('snapshot-minutes-bar').style.width = `${Math.min(totalMinutes / 6, 100)}%`;
+        document.getElementById('snapshot-routine-bar').style.width = `${routinePercent}%`;
+        document.getElementById('snapshot-possession-bar').style.width = `${latestMatch?.possession ?? 0}%`;
+      }
+
+      function renderProfile() {
+        const name = appData.profile.name.trim();
+        const position = appData.profile.position;
+        document.getElementById('player-name').value = name;
+        document.getElementById('player-position').value = position;
+        document.getElementById('player-display-name').textContent = name || 'Your player profile';
+        document.getElementById('player-position-display').textContent = position || 'Add your name and position below';
+      }
+
+      function renderApp() {
+        renderProfile();
+        renderSessions();
+        renderRoutine();
+        renderDashboard();
+      }
+
+      function setWatchStatus(connected, message) {
+        watchStatus.textContent = connected ? 'Connected' : 'Not connected';
+        watchStatus.classList.toggle('connected', connected);
+        watchMessage.textContent = message;
+        syncButton.textContent = connected ? 'Disconnect watch' : 'Connect watch';
+      }
+
+      function handleHeartRateMeasurement(event) {
+        const data = event.target.value;
+        const isEightBitValue = (data.getUint8(0) & 0x01) === 0;
+        const heartRate = isEightBitValue ? data.getUint8(1) : data.getUint16(1, true);
+        heartRateEl.textContent = heartRate;
+      }
+
+      function handleWatchDisconnected() {
+        connectedWatch = null;
+        heartRateCharacteristic = null;
+        heartRateEl.textContent = '--';
+        watchDeviceName.textContent = 'No Bluetooth device selected';
+        setWatchStatus(false, 'Watch disconnected. Select Connect watch to pair again.');
+      }
+
+      async function connectWatch() {
+        if (!navigator.bluetooth) {
+          setWatchStatus(false, 'Bluetooth is unavailable here. Use a supported browser on HTTPS or localhost.');
+          return;
+        }
+
+        let selectedDevice = false;
+        try {
+          watchMessage.textContent = 'Choose your watch from nearby Bluetooth devices…';
+          const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: ['heart_rate']
+          });
+          selectedDevice = true;
+          watchDeviceName.textContent = `Selected device: ${device.name || 'Name not provided by device'}`;
+
+          device.addEventListener('gattserverdisconnected', handleWatchDisconnected);
+          const server = await device.gatt.connect();
+          const service = await server.getPrimaryService('heart_rate');
+          heartRateCharacteristic = await service.getCharacteristic('heart_rate_measurement');
+          await heartRateCharacteristic.startNotifications();
+          heartRateCharacteristic.addEventListener('characteristicvaluechanged', handleHeartRateMeasurement);
+          connectedWatch = device;
+          setWatchStatus(true, `Receiving heart-rate data from ${device.name || 'the selected device'}.`);
+        } catch (error) {
+          const message = selectedDevice && (error.name === 'NotFoundError' || error.name === 'NotSupportedError')
+            ? 'The selected device does not expose the standard Bluetooth heart-rate service. Try enabling its heart-rate broadcast or use a compatible sensor.'
+            : error.name === 'NotFoundError'
+              ? 'No compatible heart-rate device was selected. Press Start on the watch, enable heart-rate broadcast, and try again.'
+              : error.name === 'SecurityError'
+                ? 'Bluetooth requires a supported browser and a secure page (HTTPS or localhost).'
+                : error.name === 'NotAllowedError'
+                  ? 'Bluetooth permission was cancelled or denied.'
+                  : 'Could not connect. Keep the device nearby, enable Bluetooth, and try again.';
+          setWatchStatus(false, message);
+        }
+      }
+
+      function addChatMessage(sender, text) {
+        const msg = document.createElement('div');
+        msg.className = `message ${sender}`;
+        msg.textContent = text;
+        chatWindow.appendChild(msg);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return msg;
+      }
+
+      function clearSelectedPhoto() {
+        photoReadToken += 1;
+        isPhotoReading = false;
+        selectedImageData = '';
+        if (selectedImagePreviewUrl) URL.revokeObjectURL(selectedImagePreviewUrl);
+        selectedImagePreviewUrl = '';
+        photoInput.value = '';
+        photoPreview.removeAttribute('src');
+        photoPreview.hidden = true;
+        removePhotoButton.hidden = true;
+        photoHelp.textContent = 'On a phone, choose Camera or Photo Library.';
+      }
+
+      function prepareSelectedPhoto(file) {
+        if (!file) return;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+          clearSelectedPhoto();
+          photoHelp.textContent = 'Choose a JPG, PNG, WebP, or GIF photo.';
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          clearSelectedPhoto();
+          photoHelp.textContent = 'Choose a photo smaller than 3 MB.';
+          return;
+        }
+
+        isPhotoReading = true;
+        const token = ++photoReadToken;
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          if (token !== photoReadToken) return;
+          isPhotoReading = false;
+          selectedImageData = typeof reader.result === 'string' ? reader.result : '';
+          if (!selectedImageData) {
+            photoHelp.textContent = 'Could not read that photo. Choose it again and retry.';
+            return;
+          }
+          if (selectedImagePreviewUrl) URL.revokeObjectURL(selectedImagePreviewUrl);
+          selectedImagePreviewUrl = URL.createObjectURL(file);
+          photoPreview.src = selectedImagePreviewUrl;
+          photoPreview.hidden = false;
+          removePhotoButton.hidden = false;
+          photoHelp.textContent = `${file.name} is ready to send.`;
+        });
+        reader.addEventListener('error', () => {
+          if (token !== photoReadToken) return;
+          isPhotoReading = false;
+          photoHelp.textContent = 'Could not read that photo. Choose it again and retry.';
+        });
+        reader.readAsDataURL(file);
+      }
+
+      async function sendToAiCoach(question) {
+        if (isChatSending) return;
+        if (isPhotoReading) {
+          photoHelp.textContent = 'Wait for the photo preview to finish loading, then send again.';
+          return;
+        }
+        const image = selectedImageData;
+        const message = question.trim() || (image ? 'Please describe this football training photo and give me a useful practice suggestion.' : '');
+        if (!message && !image) return;
+
+        const isStaticGitHubPages = location.hostname.endsWith('.github.io');
+        if (location.protocol === 'file:' || isStaticGitHubPages) {
+          const localUserMessage = addChatMessage('user', message);
+          if (image) {
+            const localImage = document.createElement('img');
+            localImage.className = 'message-image';
+            localImage.alt = 'Photo attached to the question';
+            localImage.src = image;
+            localUserMessage.appendChild(localImage);
+          }
+          if (image) {
+            addChatMessage('ai', 'I can’t analyze photos in this free coach. Your photo stays on this device and is not uploaded. Text football questions can still get built-in tips or free online summaries.');
+          } else {
+            const offlineAnswer = getCoachReply(message);
+            if (offlineAnswer.startsWith('I didn’t recognize that topic.')) {
+              const reply = addChatMessage('ai', 'Searching the web for a football answer…');
+              try {
+                const result = await searchFootballWeb(message);
+                reply.textContent = result
+                  ? `Online answer: ${result.title}\n\n${result.extract}`
+                  : 'I couldn’t find a useful article for that question. Try adding the player, team, or football topic name.';
+              } catch (error) {
+                reply.textContent = 'I couldn’t reach the free web lookup. Check your internet connection and try again. Built-in football tips still work offline.';
+              }
+            } else {
+              addChatMessage('ai', offlineAnswer);
+            }
+          }
+          chatInput.value = '';
+          clearSelectedPhoto();
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+          return;
+        }
+
+        const playerMessage = addChatMessage('user', message);
+        const priorHistory = conversationHistory.slice(-8);
+        conversationHistory.push({ role: 'user', content: message });
+        if (image) {
+          const attachedImage = document.createElement('img');
+          attachedImage.className = 'message-image';
+          attachedImage.alt = 'Photo attached to the question';
+          attachedImage.src = image;
+          playerMessage.appendChild(attachedImage);
+        }
+        chatInput.value = '';
+        clearSelectedPhoto();
+        const replyMessage = addChatMessage('ai', 'Thinking…');
+        isChatSending = true;
+        const sendButton = chatForm.querySelector('button[type="submit"]');
+        sendButton.disabled = true;
+        suggestionButtons.forEach((button) => { button.disabled = true; });
+
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, image, history: priorHistory })
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const fallbackErrors = {
+              404: 'The AI endpoint was not found. Deploy this project with its api/chat.js backend.',
+              405: 'The deployed host is not accepting the chat POST request. Deploy the project with its api/chat.js serverless function enabled (for example, deploy this folder to Vercel). Do not open /api/chat directly; the chat sends POST requests to it.',
+              413: 'This request or photo is too large. Choose a smaller image and try again.',
+              429: 'Too many questions were sent. Wait a minute and try again.',
+              500: 'The AI server encountered an error. Ask the site owner to check the server logs.',
+              502: 'The AI provider could not complete the request. Ask the site owner to check the server logs and AI account status.',
+              504: 'The AI request timed out. Try a shorter question or a smaller photo.'
+            };
+            const requestError = new Error(result.error || fallbackErrors[response.status] || `The AI server returned error ${response.status}. Ask the site owner to check the deployment.`);
+            requestError.status = response.status;
+            throw requestError;
+          }
+          if (typeof result.reply !== 'string' || !result.reply.trim()) {
+            throw new Error('The AI server returned no answer. Try again, or ask the site owner to check the server logs.');
+          }
+          replyMessage.textContent = result.reply;
+          conversationHistory.push({ role: 'assistant', content: result.reply });
+        } catch (error) {
+          const setupMessage = location.protocol === 'file:'
+            ? 'Real AI cannot run from a file opened directly. To turn it on locally, save your secret OPENAI_API_KEY in a private .env.local file, run npm install and npm run dev in this project folder, then open the local address Vercel prints. Upstash is only required when deploying. Never put the key in this page.'
+            : error.status === 503
+              ? error.message
+              : error.status === 404
+                ? 'The AI endpoint was not found. Deploy this project with its api/chat.js backend and configure the server secrets.'
+                : error.status === 405
+                  ? error.message
+                : error.status === 413 || error.status === 429
+                  ? error.message
+                  : error.name === 'TypeError'
+                    ? 'Could not reach the AI server. Check your internet connection and confirm the site was deployed with its /api/chat endpoint.'
+                    : error.message || 'The AI server is not responding.';
+          const fallback = getCoachReply(message);
+          const isUnclear = /^(what|huh|why|how|when|where|who|which|ok|okay|wat|wut|test)[?!.,\s]*$/i.test(message);
+          const offlineReply = image
+            ? `AI is offline, so I can’t inspect the photo yet. ${setupMessage}`
+            : isUnclear
+              ? `I’m not sure what you mean by “${message}.” Ask a full question, like “How can I improve my passing?” ${setupMessage}`
+              : `AI is offline. ${setupMessage} I can still offer this built-in tip: ${fallback}`;
+          replyMessage.textContent = offlineReply;
+          conversationHistory.push({ role: 'assistant', content: offlineReply });
+        } finally {
+          isChatSending = false;
+          sendButton.disabled = false;
+          suggestionButtons.forEach((button) => { button.disabled = false; });
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+      }
+
+      async function searchFootballWeb(question) {
+        const params = new URLSearchParams({
+          action: 'query',
+          generator: 'search',
+          gsrsearch: `football ${question.slice(0, 160)}`,
+          gsrnamespace: '0',
+          gsrlimit: '1',
+          prop: 'extracts|info',
+          exchars: '700',
+          explaintext: '1',
+          inprop: 'url',
+          format: 'json',
+          origin: '*'
+        });
+        const response = await fetch(`https://en.wikipedia.org/w/api.php?${params}`, {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(8000)
+        });
+        if (!response.ok) throw new Error('Wikipedia lookup failed');
+        const data = await response.json();
+        const article = Object.values(data.query?.pages || {})[0];
+        if (!article?.extract) return null;
+        const cleanExtract = article.extract.replace(/==+\s*(.*?)\s*==+/g, '$1').replace(/\s+/g, ' ').trim();
+        const extract = cleanExtract.length > 650
+          ? `${cleanExtract.slice(0, 647).replace(/\s+\S*$/, '')}…`
+          : cleanExtract;
+        return {
+          title: article.title,
+          extract,
+          url: typeof article.fullurl === 'string' && article.fullurl.startsWith('https://en.wikipedia.org/wiki/') ? article.fullurl : ''
+        };
+      }
+
+      function getCoachReply(question) {
+        const text = question.toLowerCase().trim();
+        const has = (...terms) => terms.some((term) => {
+          if (term.includes(' ')) return text.includes(term);
+          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          return new RegExp(`\\b${escaped}\\b`).test(text);
+        });
+        const name = appData.profile.name ? `${appData.profile.name}, ` : '';
+        const say = (answer) => {
+          const response = `${name}${answer}`;
+          return name ? response : `${response.charAt(0).toUpperCase()}${response.slice(1)}`;
+        };
+
+        if (!text) return 'Ask me about passing, shooting, dribbling, speed, recovery, routines, or your saved tracker stats.';
+        if (/^(what|huh|why|how|when|where|who|which|ok|okay|wat|wut|test)[?!.,\s]*$/i.test(text)) {
+          return 'I’m not sure what you mean yet. Ask a full football question, like “How can I improve my passing?”';
+        }
+
+        if (/\b(hi|hello|hey|help)\b/.test(text)) {
+          return 'Hi! Ask about a football skill, a training routine, match preparation, or the stats you have saved here.';
+        }
+
+        if (has('how many', 'my stats', 'my progress', 'training total', 'what have i logged', 'my data')) {
+          const totalMinutes = appData.sessions.reduce((total, session) => total + Number(session.duration || 0), 0);
+          const latestMatch = appData.matches[appData.matches.length - 1];
+          const steps = latestMatch?.steps === null || latestMatch?.steps === undefined ? 'no steps recorded yet' : `${Number(latestMatch.steps).toLocaleString()} steps in the latest match entry`;
+          const possession = latestMatch?.possession === null || latestMatch?.possession === undefined ? 'no possession entry yet' : `${latestMatch.possession}% team possession in the latest match entry`;
+          return say(`you have logged ${appData.sessions.length} training session${appData.sessions.length === 1 ? '' : 's'} (${totalMinutes} minutes), ${appData.routine.length} routine task${appData.routine.length === 1 ? '' : 's'}, ${steps}, and ${possession}. These are only the values you entered or your watch supplied.`);
+        }
+
+        if (has('routine', 'daily plan', 'schedule', 'organize my training')) {
+          const unfinished = appData.routine.filter((task) => !task.done).length;
+          return appData.routine.length
+            ? say(`your routine has ${unfinished} unfinished task${unfinished === 1 ? '' : 's'}. Keep each practice block manageable: warm up, work on one skill, then cool down. You can add or check tasks in My routine.`)
+            : say('start with a short warm-up, one 15–25 minute skill block, and a cool-down. Add the routine tasks and times that fit your schedule; ask your coach to adjust the workload.');
+        }
+
+        if (has('pass', 'passing', 'first touch', 'receive', 'control')) {
+          return say('try 3 rounds of 10 passes against a wall with each foot. Cushion the first touch into space, keep your body open, and look up before the next pass. Stop if anything hurts.');
+        }
+
+        if (has('shoot', 'shooting', 'shot', 'finishing', 'finish')) {
+          return say('practise close-range finishing from both sides: take a controlled first touch, glance at the target, then place the shot. Start slowly and focus on technique before adding speed.');
+        }
+
+        if (has('juggle', 'juggling', 'keep ups', 'keep-ups', 'keepy uppies')) {
+          return say('start by dropping the ball onto your foot and catching it after one touch. Repeat 10 times on each foot. Then try two touches before catching; keep your ankle firm and tap the ball gently upward around knee height. Let it bounce once between touches if that helps, and build up slowly.');
+        }
+
+        if (has('dribble', 'dribbling', '1v1', 'beat a player', 'ball mastery')) {
+          return say('set up 3–4 cones and practise close touches using both feet. Keep your head lifting between touches; finish each run with one change of direction or pace.');
+        }
+
+        if (has('defend', 'defending', 'tackle', 'tackling', 'marking', 'pressing')) {
+          return say('practise staying balanced, keeping a safe distance, and guiding an attacker away from the middle. Work with a partner and follow your coach’s guidance on contact and tackling.');
+        }
+
+        if (has('goalkeeper', 'goalkeepers', 'keeper', 'goalie', 'save', 'diving')) {
+          return say('work on ready position, footwork, and controlled catching with a partner. Use safe, low-speed repetitions first; practise diving only with suitable space and coaching.');
+        }
+
+        if (has('speed', 'sprint', 'sprinting', 'fast', 'faster', 'acceleration')) {
+          return say('after a warm-up, try 4–6 short accelerations of about 10–20 metres with full walking recovery. Stop when your technique fades, and skip hard sprints if you are injured or unusually tired.');
+        }
+
+        if (has('stamina', 'fitness', 'conditioning', 'endurance')) {
+          return say('build fitness gradually with easy running or ball intervals you can complete while still controlling your breathing. Increase only one part—time, speed, or repetitions—at a time, and include recovery days.');
+        }
+
+        if (has('recover', 'recovery', 'recovering', 'tired', 'sore', 'fatigue', 'energy')) {
+          return say('after training, cool down gently, drink to thirst, and get enough rest. If you feel sharp pain, dizziness, or feel unwell, stop and tell a trusted adult or coach rather than training through it.');
+        }
+
+        if (has('warm up', 'warm-up', 'before training')) {
+          return say('begin with a few minutes of easy movement, then dynamic movements and gradual ball touches. Build intensity progressively; save long static stretches for after training.');
+        }
+
+        if (has('water', 'hydration', 'eat', 'eating', 'food', 'meal', 'nutrition')) {
+          return 'For general training, have regular meals and water available, especially around exercise. Needs differ by person; ask a parent, coach, or qualified health professional for individual nutrition advice.';
+        }
+
+        if (has('possession', 'steps', 'heart rate', 'heartrate', 'watch', 'wearable')) {
+          const latestMatch = appData.matches[appData.matches.length - 1];
+          if (has('heart rate', 'heartrate', 'watch', 'wearable')) {
+            return heartRateEl.textContent === '--'
+              ? 'No live heart-rate reading is coming from a connected watch right now. Start a workout on a compatible watch, then connect it with the Bluetooth button.'
+              : `The connected watch is currently reporting ${heartRateEl.textContent} bpm. This tracker does not interpret heart rate as a medical or readiness assessment.`;
+          }
+          if (!latestMatch) return 'No match steps or possession have been saved yet. Enter the real numbers in Log match stats; the tracker will not guess them.';
+          const steps = latestMatch.steps === null ? 'steps not entered' : `${Number(latestMatch.steps).toLocaleString()} steps`;
+          const possession = latestMatch.possession === null ? 'possession not entered' : `${latestMatch.possession}% team possession`;
+          return `Your latest match entry has ${steps} and ${possession}. These are manually recorded match stats, not measurements from the watch.`;
+        }
+
+        if (has('ready', 'readiness', 'nervous', 'pressure', 'game day', 'match ready', 'am i ready')) {
+          return 'I cannot measure match readiness from this tracker. Follow your coach’s plan, use a familiar warm-up, and tell a trusted adult or coach if you feel unwell, injured, or worried.';
+        }
+
+        if (has('focus', 'today', 'practice', 'train', 'training', 'work on')) {
+          const recentCutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+          const recentTypes = new Set(appData.sessions.filter((session) => Date.parse(session.createdAt) >= recentCutoff).map((session) => session.type.toLowerCase()));
+          const nextFocus = [
+            { type: 'passing', title: 'passing with both feet', drill: 'Pass against a wall for 3 short rounds, alternating feet and checking your shoulder before receiving.' },
+            { type: 'technical', title: 'close ball control', drill: 'Use a few cones for close-control touches, then finish with a calm first touch into space.' },
+            { type: 'fitness', title: 'movement and recovery', drill: 'Choose light movement today if you have trained hard recently; add speed work only when rested and warmed up.' }
+          ].find((focus) => !recentTypes.has(focus.type));
+          return nextFocus
+            ? say(`try ${nextFocus.title}: ${nextFocus.drill} Warm up first and adjust the session to your coach’s plan.`)
+            : say('your recent logs include passing, technical, and fitness work. Choose a light recovery session or ask your coach what to prioritize next.');
+        }
+
+        return 'I didn’t recognize that topic. Try asking about passing, shooting, dribbling, defending, goalkeeper practice, speed, stamina, recovery, routines, match preparation, or your saved stats.';
+      }
+
+      renderApp();
+
+      profileForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        appData.profile = {
+          name: document.getElementById('player-name').value.trim(),
+          position: document.getElementById('player-position').value
+        };
+        const saved = saveAppData();
+        renderProfile();
+        document.getElementById('profile-message').textContent = saved
+          ? 'Profile saved in this browser.'
+          : 'Could not save. Check browser storage settings.';
+      });
+
+      matchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const stepsInput = document.getElementById('match-steps').value;
+        const possessionInput = document.getElementById('match-possession').value;
+        if (!stepsInput && !possessionInput) {
+          document.getElementById('match-message').textContent = 'Enter steps, possession, or both before saving.';
+          return;
+        }
+
+        appData.matches.push({
+          steps: stepsInput === '' ? null : Number(stepsInput),
+          possession: possessionInput === '' ? null : Number(possessionInput),
+          createdAt: new Date().toISOString()
+        });
+        const saved = saveAppData();
+        if (saved) {
+          matchForm.reset();
+          document.getElementById('match-message').textContent = 'Match stats saved on this device.';
+          renderDashboard();
+        } else {
+          appData.matches.pop();
+          document.getElementById('match-message').textContent = 'Could not save. Check browser storage settings.';
+        }
+      });
+
+      exportButton.addEventListener('click', function () {
+        const backup = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(backup);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'footforge-backup.json';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+
+      importButton.addEventListener('click', () => importInput.click());
+
+      importInput.addEventListener('change', async function () {
+        const file = importInput.files[0];
+        if (!file) return;
+
+        try {
+          const backup = JSON.parse(await file.text());
+          if (!backup.profile || !Array.isArray(backup.sessions) || !Array.isArray(backup.routine) || !Array.isArray(backup.matches)) {
+            throw new Error('invalid backup');
+          }
+
+          const hasSavedEntries = appData.sessions.length || appData.routine.length || appData.matches.length || appData.profile.name;
+          if (hasSavedEntries && !window.confirm('Restoring a backup replaces the data currently saved in this browser. Continue?')) {
+            document.getElementById('backup-message').textContent = 'Restore cancelled. Your current data was kept.';
+            return;
+          }
+
+          const previous = JSON.stringify(appData);
+          appData.profile = {
+            name: typeof backup.profile.name === 'string' ? backup.profile.name.slice(0, 50) : '',
+            position: typeof backup.profile.position === 'string' ? backup.profile.position : ''
+          };
+          appData.sessions = backup.sessions.filter((item) => item && typeof item.name === 'string' && typeof item.type === 'string').map((item) => ({
+            id: typeof item.id === 'string' ? item.id : `${Date.now()}-${Math.random()}`,
+            name: item.name.slice(0, 100),
+            type: item.type.slice(0, 40),
+            duration: Math.max(0, Number(item.duration) || 0),
+            notes: typeof item.notes === 'string' ? item.notes.slice(0, 1000) : '',
+            createdAt: Number.isNaN(Date.parse(item.createdAt)) ? new Date().toISOString() : item.createdAt
+          }));
+          appData.routine = backup.routine.filter((item) => item && typeof item.name === 'string').map((item) => ({
+            id: typeof item.id === 'string' ? item.id : `${Date.now()}-${Math.random()}`,
+            name: item.name.slice(0, 100),
+            time: typeof item.time === 'string' ? item.time.slice(0, 60) : 'Flexible',
+            done: Boolean(item.done)
+          }));
+          appData.matches = backup.matches.filter((item) => item && (item.steps === null || Number.isFinite(Number(item.steps))) && (item.possession === null || Number.isFinite(Number(item.possession)))).map((item) => ({
+            steps: item.steps === null ? null : Math.max(0, Number(item.steps)),
+            possession: item.possession === null ? null : Math.min(100, Math.max(0, Number(item.possession))),
+            createdAt: Number.isNaN(Date.parse(item.createdAt)) ? new Date().toISOString() : item.createdAt
+          }));
+
+          if (!saveAppData()) {
+            Object.assign(appData, JSON.parse(previous));
+            throw new Error('storage unavailable');
+          }
+          renderApp();
+          document.getElementById('backup-message').textContent = 'Backup restored successfully.';
+        } catch (error) {
+          document.getElementById('backup-message').textContent = 'That backup could not be restored. Choose a valid FootForge backup file.';
+        } finally {
+          importInput.value = '';
+        }
+      });
+
+      chatForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        sendToAiCoach(chatInput.value);
+      });
+
+      attachPhotoButton.addEventListener('click', () => photoInput.click());
+      removePhotoButton.addEventListener('click', clearSelectedPhoto);
+      photoInput.addEventListener('change', () => prepareSelectedPhoto(photoInput.files[0]));
+
+      syncButton.addEventListener('click', function () {
+        if (connectedWatch?.gatt?.connected) {
+          connectedWatch.gatt.disconnect();
+          return;
+        }
+        connectWatch();
+      });
+
+      suggestionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          sendToAiCoach(button.textContent.trim());
+        });
+      });
+
+      routineForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const task = document.getElementById('routine-name').value.trim();
+        const time = document.getElementById('routine-time').value.trim() || 'Flexible';
+
+        if (!task) return;
+        appData.routine.push({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, name: task, time, done: false });
+        if (!saveAppData()) {
+          appData.routine.pop();
+          document.getElementById('routine-message').textContent = 'Could not save. Check browser storage settings.';
+          return;
+        }
+        routineForm.reset();
+        document.getElementById('routine-message').textContent = 'Task saved on this device.';
+        renderRoutine();
+        renderDashboard();
+      });
+
+      routineList.addEventListener('click', function (event) {
+        const remove = event.target.closest('.remove-button');
+        if (remove) {
+          const index = appData.routine.findIndex((item) => item.id === remove.dataset.id);
+          if (index < 0) return;
+          const [deleted] = appData.routine.splice(index, 1);
+          if (!saveAppData()) appData.routine.splice(index, 0, deleted);
+          renderRoutine();
+          renderDashboard();
+          return;
+        }
+
+        const button = event.target.closest('.routine-check');
+        if (!button) return;
+        const task = appData.routine.find((item) => item.id === button.dataset.id);
+        if (!task) return;
+        task.done = !task.done;
+        if (!saveAppData()) task.done = !task.done;
+        renderRoutine();
+        renderDashboard();
+      });
+
+      sessionForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('session-name').value.trim();
+        const type = document.getElementById('session-type').value;
+        const duration = Number(document.getElementById('session-duration').value);
+        const notes = document.getElementById('session-notes').value.trim();
+
+        if (!name) return;
+        appData.sessions.push({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, name, type, duration, notes, createdAt: new Date().toISOString() });
+        if (!saveAppData()) {
+          appData.sessions.pop();
+          document.getElementById('session-message').textContent = 'Could not save. Check browser storage settings.';
+          return;
+        }
+        sessionForm.reset();
+        document.getElementById('session-duration').value = '40';
+        document.getElementById('session-message').textContent = 'Session saved on this device.';
+        renderSessions();
+        renderDashboard();
+      });
+
+      sessionList.addEventListener('click', function (event) {
+        const button = event.target.closest('.remove-button');
+        if (!button) return;
+        const index = appData.sessions.findIndex((session) => session.id === button.dataset.id);
+        if (index < 0) return;
+        const [deleted] = appData.sessions.splice(index, 1);
+        if (!saveAppData()) appData.sessions.splice(index, 0, deleted);
+        renderSessions();
+        renderDashboard();
+      });
+    </script>
+  </body>
+</html>
